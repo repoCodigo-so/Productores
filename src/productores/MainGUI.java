@@ -1,25 +1,23 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package productores;
 
-/**
- *
- * @author User
- */
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainGUI {
     private final JFrame ventana;
     private final JButton btnIniciar;
     private final JButton btnDetener;
-    private final JButton btnReiniciarGUI;
-    private final JPanel productoresPanel;
-    private final JPanel consumidoresPanel;
+    private final JButton btnAgregarProductor;
+    private final JButton btnEliminarProductor;
+    private final JButton btnAgregarConsumidor;
+    private final JButton btnEliminarConsumidor;
+    private final DefaultListModel<String> elementosListModel;
+    private final JList<String> elementosList;
+    private final JScrollPane elementosScrollPane;
     private final SimulationController controller;
     private final GUIRepresentation guiRepresentation;
 
@@ -34,7 +32,6 @@ public class MainGUI {
         // Botones para iniciar y detener la simulación
         btnIniciar = new JButton("Iniciar Simulación");
         btnDetener = new JButton("Detener Simulación");
-        btnReiniciarGUI = new JButton("Reiniciar GUI");
 
         btnIniciar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -48,28 +45,52 @@ public class MainGUI {
             }
         });
 
-        btnReiniciarGUI.addActionListener(new ActionListener() {
+        // Botones para agregar y eliminar productores y consumidores
+        btnAgregarProductor = new JButton("Agregar Productor");
+        btnEliminarProductor = new JButton("Eliminar Productor");
+        btnAgregarConsumidor = new JButton("Agregar Consumidor");
+        btnEliminarConsumidor = new JButton("Eliminar Consumidor");
+
+        btnAgregarProductor.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                reiniciarGUI();
+                agregarProductor();
+            }
+        });
+
+        btnEliminarProductor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                eliminarProductor();
+            }
+        });
+
+        btnAgregarConsumidor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                agregarConsumidor();
+            }
+        });
+
+        btnEliminarConsumidor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                eliminarConsumidor();
             }
         });
 
         JPanel panelBotones = new JPanel();
         panelBotones.add(btnIniciar);
         panelBotones.add(btnDetener);
-        panelBotones.add(btnReiniciarGUI);
+        panelBotones.add(btnAgregarProductor);
+        panelBotones.add(btnEliminarProductor);
+        panelBotones.add(btnAgregarConsumidor);
+        panelBotones.add(btnEliminarConsumidor);
 
-        // Paneles para mostrar productores y consumidores
-        productoresPanel = new JPanel();
-        consumidoresPanel = new JPanel();
-
-        JScrollPane productoresScrollPane = new JScrollPane(productoresPanel);
-        JScrollPane consumidoresScrollPane = new JScrollPane(consumidoresPanel);
+        // Lista para mostrar los elementos
+        elementosListModel = new DefaultListModel<>();
+        elementosList = new JList<>(elementosListModel);
+        elementosScrollPane = new JScrollPane(elementosList);
 
         ventana.setLayout(new BorderLayout());
         ventana.add(panelBotones, BorderLayout.NORTH);
-        ventana.add(productoresScrollPane, BorderLayout.WEST);
-        ventana.add(consumidoresScrollPane, BorderLayout.EAST);
+        ventana.add(elementosScrollPane, BorderLayout.CENTER);
 
         actualizarEstadoBotones();
     }
@@ -88,32 +109,59 @@ public class MainGUI {
         actualizarEstadoBotones();
     }
 
-    private void reiniciarGUI() {
-        guiRepresentation.limpiarConsumo();
+    private void agregarProductor() {
+        controller.agregarProductor();
+        actualizarEstadoBotones();
     }
 
-    // Actualiza el estado de los botones según la simulación
+    private void eliminarProductor() {
+        controller.eliminarProductor();
+        actualizarEstadoBotones();
+    }
+
+    private void agregarConsumidor() {
+        controller.agregarConsumidor();
+        actualizarEstadoBotones();
+    }
+
+    private void eliminarConsumidor() {
+        controller.eliminarConsumidor();
+        actualizarEstadoBotones();
+    }
+
     private void actualizarEstadoBotones() {
         btnIniciar.setEnabled(!controller.isSimulacionActiva());
         btnDetener.setEnabled(controller.isSimulacionActiva());
-        btnReiniciarGUI.setEnabled(!controller.isSimulacionActiva());
+        btnAgregarProductor.setEnabled(!controller.isSimulacionActiva());
+        btnEliminarProductor.setEnabled(!controller.isSimulacionActiva() && controller.hayProductores());
+        btnAgregarConsumidor.setEnabled(!controller.isSimulacionActiva());
+        btnEliminarConsumidor.setEnabled(!controller.isSimulacionActiva() && controller.hayConsumidores());
+    }
+
+    public void agregarElementoALista(String elemento) {
+        elementosListModel.addElement(elemento);
+    }
+
+    public void elementoProducido(int id, Elemento elemento) {
+        String mensaje = "Elemento #" + id + " - Produciendo: " + elemento.getContenido();
+        agregarElementoALista(mensaje);
+    }
+
+    public void elementoConsumido(int id, Elemento elemento) {
+        String mensaje = "Elemento #" + id + " - Consumiendo: " + elemento.getContenido();
+        agregarElementoALista(mensaje);
     }
 
     public static void main(String[] args) {
-        // Dialogs for inputting the buffer size, number of consumers, and number of producers
-        int bufferSize = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el tamaño del buffer:"));
-        int numConsumers = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número de Consumidores:"));
-        int numProducers = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el número de Productores:"));
-
-        // Create a simulation controller with the specified parameters
-        Buffer buffer = new Buffer(bufferSize);
+        Buffer buffer = new Buffer(10); // Cambia la capacidad según tus necesidades
+        List<Productor> productores = new ArrayList<>();
+        List<Consumidor> consumidores = new ArrayList<>();
         GUIRepresentation guiRepresentation = new GUIRepresentation(buffer.obtenerContenido());
-        SimulationController controller = new SimulationController(bufferSize, numConsumers, numProducers, guiRepresentation);
+        SimulationController controller = new SimulationController(buffer, productores, consumidores, guiRepresentation, null);
 
-        // Create an instance of MainGUI and pass the GUIRepresentation
         MainGUI mainGUI = new MainGUI(controller, guiRepresentation);
+        controller.setMainGUI(mainGUI);
 
-        // Show the main window
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 mainGUI.mostrarVentana();

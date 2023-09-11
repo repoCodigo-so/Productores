@@ -5,15 +5,17 @@ import javax.swing.SwingUtilities;
 public class Consumidor implements Runnable {
     private Buffer buffer;
     private GUIRepresentation guiRepresentation;
+    private MainGUI mainGUI; // Nueva referencia a MainGUI
     private int id;
     private EstadoConsumidor estado;
     private int tiempoConsumo; // Variable para almacenar el tiempo de consumo
     private boolean running;
 
-    public Consumidor(int id, Buffer buffer, GUIRepresentation guiRepresentation) {
+    public Consumidor(int id, Buffer buffer, GUIRepresentation guiRepresentation, MainGUI mainGUI) {
         this.id = id;
         this.buffer = buffer;
         this.guiRepresentation = guiRepresentation;
+        this.mainGUI = mainGUI; // Asigna la referencia a MainGUI
         this.estado = EstadoConsumidor.INACTIVO;
         this.tiempoConsumo = 1000; // Tiempo predeterminado de consumo (en milisegundos)
         this.running = true;
@@ -31,16 +33,13 @@ public class Consumidor implements Runnable {
                 // En este ejemplo, simplemente dormimos al hilo durante el tiempo de consumo configurado.
                 Thread.sleep(tiempoConsumo);
 
-                // Actualiza la GUIRepresentation para reflejar el consumo y luego límpialo
-                SwingUtilities.invokeLater(() -> {
-                    guiRepresentation.consumirElemento(id, elemento);
-                });
+                // Actualiza la GUIRepresentation para reflejar el consumo a través de MainGUI
+                String mensaje = "Elemento #" + id + " - Consumiendo: " + elemento.getContenido();
+                mainGUI.agregarElementoALista(mensaje);
 
-                // Limpia el estado en la GUI después de un tiempo
-                Thread.sleep(1000);
-                SwingUtilities.invokeLater(() -> {
-                    guiRepresentation.limpiarConsumo(id);
-                });
+                // Limpia el consumo a través de MainGUI
+                // mainGUI.limpiarListaElementos();
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -49,6 +48,7 @@ public class Consumidor implements Runnable {
 
     public void setEstado(EstadoConsumidor estado) {
         this.estado = estado;
+        guiRepresentation.cambiarColorBotonConsumidor(id, estado.getColor());
     }
 
     public EstadoConsumidor getEstado() {

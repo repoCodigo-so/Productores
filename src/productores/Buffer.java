@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package productores;
 
-/**
- *
- * @author User
- */
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -30,7 +22,9 @@ public class Buffer {
 
         buffer.offer(elemento); // Agregar el elemento al búfer
         productor.setEstado(EstadoProductor.PRODUCIENDO);
-        notifyAll(); // Despertar a los consumidores si alguno está esperando
+
+        // Notificar a todos los hilos que están esperando (en caso de que haya consumidores esperando)
+        notifyAll();
     }
 
     public synchronized Elemento consumir(Consumidor consumidor) throws InterruptedException {
@@ -42,7 +36,9 @@ public class Buffer {
 
         Elemento elemento = buffer.poll(); // Tomar el elemento del búfer
         consumidor.setEstado(EstadoConsumidor.CONSUMIENDO);
-        notifyAll(); // Despertar a los productores si alguno está esperando
+
+        // Notificar a todos los hilos que están esperando (en caso de que haya productores esperando)
+        notifyAll();
 
         return elemento;
     }
@@ -56,6 +52,9 @@ public class Buffer {
     }
 
     public synchronized Elemento[] obtenerContenido() {
-        return buffer.toArray(new Elemento[0]);
+        // Convertir la cola de elementos en un arreglo
+        Elemento[] elementos = new Elemento[buffer.size()];
+        buffer.toArray(elementos);
+        return elementos;
     }
 }

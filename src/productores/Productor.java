@@ -1,28 +1,22 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package productores;
 
-/**
- *
- * @author User
- */
 import java.util.Random;
 
 public class Productor implements Runnable {
     private int id;
     private Buffer buffer;
     private GUIRepresentation guiRepresentation;
+    private MainGUI mainGUI; // Nueva referencia a MainGUI
     private int tiempoProduccion;
     private boolean running;
     private Random random;
     private EstadoProductor estado;
 
-    public Productor(int id, Buffer buffer, GUIRepresentation guiRepresentation) {
+    public Productor(int id, Buffer buffer, GUIRepresentation guiRepresentation, MainGUI mainGUI) {
         this.id = id;
         this.buffer = buffer;
         this.guiRepresentation = guiRepresentation;
+        this.mainGUI = mainGUI; // Asigna la referencia a MainGUI
         this.tiempoProduccion = 1000; // Tiempo predeterminado de producción (en milisegundos)
         this.running = true;
         this.random = new Random();
@@ -43,6 +37,9 @@ public class Productor implements Runnable {
 
                 // Cambia el color del botón del productor a ESPERANDO
                 setEstado(EstadoProductor.ESPERANDO);
+
+                // Agrega el elemento a la lista de la interfaz gráfica a través de MainGUI
+                mainGUI.agregarElementoALista("Elemento #" + id + " - Produciendo: " + elemento.getContenido());
 
                 // Espera un tiempo aleatorio antes de producir el siguiente elemento
                 int tiempoAleatorio = random.nextInt(3000) + 1000; // Tiempo entre 1000 y 4000 ms
@@ -68,7 +65,7 @@ public class Productor implements Runnable {
     public void setTiempoProduccion(int tiempoProduccion) {
         this.tiempoProduccion = tiempoProduccion;
     }
-    
+
     public void cambiarTiempoProduccion(int nuevoTiempo) {
         // Verifica que el nuevo tiempo sea válido (por ejemplo, no negativo)
         if (nuevoTiempo >= 0) {
@@ -85,5 +82,6 @@ public class Productor implements Runnable {
 
     public void setEstado(EstadoProductor estado) {
         this.estado = estado;
+        guiRepresentation.cambiarColorBotonProductor(id, estado.getColor());
     }
 }

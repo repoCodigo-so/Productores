@@ -8,6 +8,7 @@ package productores;
  *
  * @author User
  */
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,23 +19,15 @@ public class SimulationController {
     private List<Consumidor> consumidores;
     private GUIRepresentation guiRepresentation;
     private boolean simulacionActiva;
+    private MainGUI mainGUI; // Agrega una referencia a MainGUI
 
-    public SimulationController(int bufferSize, int numProductores, int numConsumidores, GUIRepresentation guiRepresentation) {
-        this.buffer = new Buffer(bufferSize);
-        this.productores = new ArrayList<>();
-        this.consumidores = new ArrayList<>();
+    public SimulationController(Buffer buffer, List<Productor> productores, List<Consumidor> consumidores, GUIRepresentation guiRepresentation, MainGUI mainGUI) {
+        this.buffer = buffer;
+        this.productores = productores;
+        this.consumidores = consumidores;
         this.guiRepresentation = guiRepresentation;
         this.simulacionActiva = false;
-
-        // Crear productores iniciales
-        for (int i = 0; i < numProductores; i++) {
-            agregarProductor();
-        }
-
-        // Crear consumidores iniciales
-        for (int i = 0; i < numConsumidores; i++) {
-            agregarConsumidor();
-        }
+        this.mainGUI = mainGUI; // Asigna la referencia a MainGUI
     }
 
     public void iniciarSimulacion() {
@@ -56,7 +49,7 @@ public class SimulationController {
     public void agregarProductor() {
         if (!simulacionActiva) {
             int id = productores.size() + 1;
-            Productor productor = new Productor(id, buffer, guiRepresentation);
+            Productor productor = new Productor(id, buffer, guiRepresentation, mainGUI);
             productores.add(productor);
             guiRepresentation.agregarBotonProductor(id, productor.getTiempoProduccion());
         }
@@ -72,7 +65,7 @@ public class SimulationController {
     public void agregarConsumidor() {
         if (!simulacionActiva) {
             int id = consumidores.size() + 1;
-            Consumidor consumidor = new Consumidor(id, buffer, guiRepresentation);
+            Consumidor consumidor = new Consumidor(id, buffer, guiRepresentation, mainGUI);
             consumidores.add(consumidor);
             guiRepresentation.agregarBotonConsumidor(id, consumidor.getTiempoConsumo());
         }
@@ -93,8 +86,7 @@ public class SimulationController {
         return !consumidores.isEmpty();
     }
 
-    // Cambiar el tiempo de producción de un productor
-    public void cambiarTiempoProductor(int id, int nuevoTiempo) {
+    public void cambiarTiempoProduccion(int id, int nuevoTiempo) {
         for (Productor productor : productores) {
             if (productor.getId() == id) {
                 productor.cambiarTiempoProduccion(nuevoTiempo);
@@ -103,7 +95,6 @@ public class SimulationController {
         }
     }
 
-    // Cambiar el tiempo de consumo de un consumidor
     public void cambiarTiempoConsumidor(int id, int nuevoTiempo) {
         for (Consumidor consumidor : consumidores) {
             if (consumidor.getId() == id) {
@@ -137,5 +128,9 @@ public class SimulationController {
         for (Consumidor consumidor : consumidores) {
             consumidor.detener();
         }
+    }
+
+    public void setMainGUI(MainGUI mainGUI) {
+        this.mainGUI = mainGUI;
     }
 }

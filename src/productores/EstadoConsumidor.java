@@ -4,12 +4,35 @@
  */
 package productores;
 
+import java.awt.Color;
+
 /**
  *
  * @author User
  */
 public enum EstadoConsumidor {
-    INACTIVO,
-    ESPERANDO,
-    CONSUMIENDO
+    ESPERANDO("Esperando", Color.YELLOW),
+    INACTIVO("Inactivo", Color.YELLOW),
+    CONSUMIENDO("Consumiendo", Color.GREEN); // Cambio aquí
+
+    private final String nombre;
+    private final Color color;
+
+    EstadoConsumidor(String nombre, Color color) { // Cambio aquí
+        this.nombre = nombre;
+        this.color = color;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

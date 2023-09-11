@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package productores;
 
-/**
- *
- * @author User
- */
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,12 +13,17 @@ public class GUIRepresentation {
     private final JLabel[] labels;
     private final Color[] colors;
     private final Elemento[] elementos;
+    private final Elemento[] elementosProducidos;
+    private final Elemento[] elementosConsumidos;
     private final JButton btnLimpiarConsumo;
     private final JButton btnReiniciarGUI;
+    private final DefaultListModel<String> elementosListModel; // Lista para los elementos
 
     public GUIRepresentation(Elemento[] elementos) {
         this.elementos = elementos;
         int numElementos = elementos.length;
+        elementosProducidos = new Elemento[numElementos];
+        elementosConsumidos = new Elemento[numElementos];
         frame = new JFrame("Representación de la Simulación");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -36,6 +33,8 @@ public class GUIRepresentation {
         buttons = new JButton[numElementos];
         labels = new JLabel[numElementos];
         colors = new Color[numElementos];
+
+        elementosListModel = new DefaultListModel<>(); // Lista de elementos para la interfaz
 
         for (int i = 0; i < numElementos; i++) {
             labels[i] = new JLabel("Elemento #" + elementos[i].getId());
@@ -76,18 +75,30 @@ public class GUIRepresentation {
         frame.setVisible(true);
     }
 
-    public void consumirElemento(int id) {
+    public void producirElemento(int id, Elemento elemento) {
+        elementosProducidos[id] = elemento;
         SwingUtilities.invokeLater(() -> {
-            if (id >= 0 && id < buttons.length) {
-                buttons[id].setBackground(Color.YELLOW);
-                colors[id] = Color.YELLOW;
-            }
+            labels[id].setText("Elemento #" + elementos[id].getId() + " - Contenido: " + elemento.getContenido());
+            buttons[id].setBackground(Color.GREEN);
+            colors[id] = Color.GREEN;
+
+            // Agregar el elemento a la lista en la interfaz
+            elementosListModel.addElement("Elemento #" + elementos[id].getId() + " - Contenido: " + elemento.getContenido());
         });
     }
 
-    public void consumirElemento(int id, Elemento elemento) {
+    public void consumirElemento(int id) {
         SwingUtilities.invokeLater(() -> {
             if (id >= 0 && id < buttons.length) {
+                if (elementosProducidos[id] != null) {
+                    // Se ha consumido el elemento producido
+                    elementosConsumidos[id] = elementosProducidos[id];
+                    elementosProducidos[id] = null;
+                    labels[id].setText("Elemento #" + elementos[id].getId() + " - Consumido: " + elementosConsumidos[id].getContenido());
+
+                    // Agregar el elemento consumido a la lista en la interfaz
+                    elementosListModel.addElement("Elemento #" + elementos[id].getId() + " - Consumido: " + elementosConsumidos[id].getContenido());
+                }
                 buttons[id].setBackground(Color.YELLOW);
                 colors[id] = Color.YELLOW;
             }
@@ -97,6 +108,8 @@ public class GUIRepresentation {
     public void limpiarConsumo(int id) {
         SwingUtilities.invokeLater(() -> {
             if (id >= 0 && id < buttons.length) {
+                elementosConsumidos[id] = null;
+                labels[id].setText("Elemento #" + elementos[id].getId());
                 buttons[id].setBackground(Color.WHITE);
                 colors[id] = Color.WHITE;
             }
@@ -106,6 +119,8 @@ public class GUIRepresentation {
     public void limpiarConsumo() {
         SwingUtilities.invokeLater(() -> {
             for (int i = 0; i < buttons.length; i++) {
+                elementosConsumidos[i] = null;
+                labels[i].setText("Elemento #" + elementos[i].getId());
                 buttons[i].setBackground(Color.WHITE);
                 colors[i] = Color.WHITE;
             }
@@ -114,19 +129,13 @@ public class GUIRepresentation {
 
     public void reiniciarGUI() {
         SwingUtilities.invokeLater(() -> {
-            // Limpia el consumo de elementos (reinicia los colores)
-            limpiarConsumo();
-
-            // Restaura cualquier otro estado de la GUI a su estado original
-            // Por ejemplo, si tienes botones, etiquetas u otros componentes que deban reiniciarse,
-            // puedes hacerlo aquí.
-            // Ejemplo de restauración de estado de botones:
-            for (int i = 0; i < buttons.length; i++) {
-                buttons[i].setEnabled(true); // Habilita todos los botones
+            for (int i = 0; i < elementos.length; i++) {
+                elementosProducidos[i] = null;
+                elementosConsumidos[i] = null;
+                labels[i].setText("Elemento #" + elementos[i].getId());
+                buttons[i].setBackground(Color.WHITE);
+                colors[i] = Color.WHITE;
             }
-
-            // Puedes agregar más lógica de restauración según tus necesidades.
-            // Asegúrate de que la interfaz esté actualizada y lista para su uso.
             frame.pack();
         });
     }

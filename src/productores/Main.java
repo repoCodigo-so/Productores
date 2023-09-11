@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+
     public static void main(String[] args) {
         // Crear un búfer compartido
         Buffer buffer = new Buffer(10); // Cambia la capacidad según tus necesidades
@@ -35,7 +36,8 @@ public class Main {
         SimulationController controller = new SimulationController(buffer, productores, consumidores, guiRepresentation);
 
         // Crear y mostrar la interfaz gráfica principal
-        MainGUI mainGUI = new MainGUI(controller);
+        MainGUI mainGUI = new MainGUI(controller, guiRepresentation); // Pasa guiRepresentation como argumento aquí
         mainGUI.mostrarVentana();
     }
+
 }
