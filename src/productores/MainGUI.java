@@ -20,10 +20,17 @@ public class MainGUI {
     private final JScrollPane elementosScrollPane;
     private final SimulationController controller;
     private final GUIRepresentation guiRepresentation;
+    private JLabel lblElementosProducidos;
+    private JLabel lblElementosConsumidos;
+    private JLabel lblElementosEnBuffer;
+    private int contadorElementosProducidos;
+    private int contadorElementosConsumidos;
 
     public MainGUI(SimulationController controller, GUIRepresentation guiRepresentation) {
         this.controller = controller;
         this.guiRepresentation = guiRepresentation;
+        contadorElementosProducidos = 0;
+        contadorElementosConsumidos = 0;
 
         ventana = new JFrame("Simulación de Productor-Consumidor");
         ventana.setSize(800, 600);
@@ -88,6 +95,16 @@ public class MainGUI {
         elementosList = new JList<>(elementosListModel);
         elementosScrollPane = new JScrollPane(elementosList);
 
+        // Etiquetas para contar elementos producidos, consumidos y en el búfer
+        lblElementosProducidos = new JLabel("Elementos Producidos: 0");
+        lblElementosConsumidos = new JLabel("Elementos Consumidos: 0");
+        lblElementosEnBuffer = new JLabel("Elementos en Búfer: 0");
+
+        // Agregar las etiquetas al panel de botones
+        panelBotones.add(lblElementosProducidos);
+        panelBotones.add(lblElementosConsumidos);
+        panelBotones.add(lblElementosEnBuffer);
+
         ventana.setLayout(new BorderLayout());
         ventana.add(panelBotones, BorderLayout.NORTH);
         ventana.add(elementosScrollPane, BorderLayout.CENTER);
@@ -145,15 +162,41 @@ public class MainGUI {
     public void elementoProducido(int id, Elemento elemento) {
         String mensaje = "Elemento #" + id + " - Produciendo: " + elemento.getContenido();
         agregarElementoALista(mensaje);
+        contadorElementosProducidos++;
+        actualizarContadorProducidos(contadorElementosProducidos);
     }
 
     public void elementoConsumido(int id, Elemento elemento) {
         String mensaje = "Elemento #" + id + " - Consumiendo: " + elemento.getContenido();
         agregarElementoALista(mensaje);
+        contadorElementosConsumidos++;
+        actualizarContadorConsumidos(contadorElementosConsumidos);
+    }
+
+    public void actualizarContadorProducidos(int contador) {
+        lblElementosProducidos.setText("Elementos Producidos: " + contador);
+    }
+
+    public void actualizarContadorConsumidos(int contador) {
+        lblElementosConsumidos.setText("Elementos Consumidos: " + contador);
+    }
+
+    public void actualizarContadorEnBuffer(int contador) {
+        lblElementosEnBuffer.setText("Elementos en Búfer: " + contador);
     }
 
     public static void main(String[] args) {
-        Buffer buffer = new Buffer(10); // Cambia la capacidad según tus necesidades
+        String input = JOptionPane.showInputDialog("Ingrese el tamaño del búfer:");
+        
+        // Validar la entrada del usuario y crear el búfer con el tamaño especificado
+        int bufferSize = 10; // Valor predeterminado
+        try {
+            bufferSize = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Entrada no válida. Se utilizará el tamaño predeterminado (10).");
+        }
+        
+        Buffer buffer = new Buffer(bufferSize); // Tamaño del búfer según la entrada del usuario o valor predeterminado
         List<Productor> productores = new ArrayList<>();
         List<Consumidor> consumidores = new ArrayList<>();
         GUIRepresentation guiRepresentation = new GUIRepresentation(buffer.obtenerContenido());

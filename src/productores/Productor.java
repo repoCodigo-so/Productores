@@ -39,11 +39,9 @@ public class Productor implements Runnable {
                 setEstado(EstadoProductor.ESPERANDO);
 
                 // Agrega el elemento a la lista de la interfaz gráfica a través de MainGUI
-                mainGUI.agregarElementoALista("Elemento #" + id + " - Produciendo: " + elemento.getContenido());
-
-                // Espera un tiempo aleatorio antes de producir el siguiente elemento
-                int tiempoAleatorio = random.nextInt(3000) + 1000; // Tiempo entre 1000 y 4000 ms
-                Thread.sleep(tiempoAleatorio);
+                mainGUI.agregarElementoALista("Productor #" + id + " - Producciendo id: " + elemento.getId() + " - Produciendo contenido: " + elemento.getContenido());
+                
+                Thread.sleep(tiempoProduccion);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

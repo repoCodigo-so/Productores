@@ -34,12 +34,12 @@ public class Consumidor implements Runnable {
                 Thread.sleep(tiempoConsumo);
 
                 // Actualiza la GUIRepresentation para reflejar el consumo a través de MainGUI
-                String mensaje = "Elemento #" + id + " - Consumiendo: " + elemento.getContenido();
+                String mensaje = "Consumidor #" + id + " - Consumiendo id: " + elemento.getId() + " - Consumiendo contenido: " + elemento.getContenido();
                 mainGUI.agregarElementoALista(mensaje);
 
+                
                 // Limpia el consumo a través de MainGUI
                 // mainGUI.limpiarListaElementos();
-
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

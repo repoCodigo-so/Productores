@@ -20,6 +20,8 @@ public class SimulationController {
     private GUIRepresentation guiRepresentation;
     private boolean simulacionActiva;
     private MainGUI mainGUI; // Agrega una referencia a MainGUI
+    private int contadorElementosProducidos = 0;
+    private int contadorElementosConsumidos = 0;
 
     public SimulationController(Buffer buffer, List<Productor> productores, List<Consumidor> consumidores, GUIRepresentation guiRepresentation, MainGUI mainGUI) {
         this.buffer = buffer;
@@ -132,5 +134,21 @@ public class SimulationController {
 
     public void setMainGUI(MainGUI mainGUI) {
         this.mainGUI = mainGUI;
+    }
+    
+    public void elementoProducido() {
+        contadorElementosProducidos++;
+        actualizarContadores();
+    }
+
+    public void elementoConsumido() {
+        contadorElementosConsumidos++;
+        actualizarContadores();
+    }
+    
+    private void actualizarContadores() {
+        mainGUI.actualizarContadorProducidos(contadorElementosProducidos);
+        mainGUI.actualizarContadorConsumidos(contadorElementosConsumidos);
+        mainGUI.actualizarContadorEnBuffer(buffer.obtenerTamaño());
     }
 }

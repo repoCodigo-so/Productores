@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class GUIRepresentation {
 
@@ -15,9 +16,10 @@ public class GUIRepresentation {
     private final Elemento[] elementos;
     private final Elemento[] elementosProducidos;
     private final Elemento[] elementosConsumidos;
-    private final JButton btnLimpiarConsumo;
+    //private final JButton btnLimpiarConsumo;
     private final JButton btnReiniciarGUI;
     private final DefaultListModel<String> elementosListModel; // Lista para los elementos
+    private SimulationController controller; // Agregar una referencia al controlador
 
     public GUIRepresentation(Elemento[] elementos) {
         this.elementos = elementos;
@@ -53,12 +55,12 @@ public class GUIRepresentation {
             panel.add(buttons[i]);
         }
 
-        btnLimpiarConsumo = new JButton("Limpiar Consumo");
+        /*btnLimpiarConsumo = new JButton("Limpiar Consumo");
         btnLimpiarConsumo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 limpiarConsumo();
             }
-        });
+        });*/
 
         btnReiniciarGUI = new JButton("Reiniciar GUI");
         btnReiniciarGUI.addActionListener(new ActionListener() {
@@ -67,12 +69,16 @@ public class GUIRepresentation {
             }
         });
 
-        panel.add(btnLimpiarConsumo);
+        //panel.add(btnLimpiarConsumo);
         panel.add(btnReiniciarGUI);
 
         frame.add(panel);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    public void setController(SimulationController controller) {
+        this.controller = controller;
     }
 
     public void producirElemento(int id, Elemento elemento) {
@@ -128,27 +134,27 @@ public class GUIRepresentation {
     }
 
     public void reiniciarGUI() {
-        SwingUtilities.invokeLater(() -> {
-            for (int i = 0; i < elementos.length; i++) {
-                elementosProducidos[i] = null;
-                elementosConsumidos[i] = null;
-                labels[i].setText("Elemento #" + elementos[i].getId());
-                buttons[i].setBackground(Color.WHITE);
-                colors[i] = Color.WHITE;
-            }
-            frame.pack();
-        });
-    }
+        frame.dispose();
+        
+        String input = JOptionPane.showInputDialog("Ingrese el tamaño del búfer:");
+        
+        // Validar la entrada del usuario y crear el búfer con el tamaño especificado
+        int bufferSize = 10; // Valor predeterminado
+        try {
+            bufferSize = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Entrada no válida. Se utilizará el tamaño predeterminado (10).");
+        }
+        
+        Buffer buffer = new Buffer(bufferSize); // Tamaño del búfer según la entrada del usuario o valor predeterminado
+        java.util.List<Productor> productores = new ArrayList<>();
+        java.util.List<Consumidor> consumidores = new ArrayList<>();
+        GUIRepresentation guiRepresentation = new GUIRepresentation(buffer.obtenerContenido());
+        SimulationController controller = new SimulationController(buffer, productores, consumidores, guiRepresentation, null);
 
-    public void agregarBotonProductor(int id, int tiempo) {
-        JButton botonProductor = new JButton("Productor " + id + " - Tiempo: " + tiempo);
-        botonProductor.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Aquí puedes agregar la lógica para cambiar el tiempo del productor si es necesario.
-            }
-        });
-        panel.add(botonProductor);
-        frame.pack();
+        MainGUI mainGUI = new MainGUI(controller, guiRepresentation);
+        controller.setMainGUI(mainGUI);
+        mainGUI.mostrarVentana();
     }
 
     public void eliminarBotonProductor(int id) {
@@ -165,11 +171,46 @@ public class GUIRepresentation {
         }
     }
 
+    public void agregarBotonProductor(int id, int tiempo) {
+        JButton botonProductor = new JButton("Productor " + id + " - Tiempo: " + tiempo);
+        botonProductor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Obtener el nuevo tiempo de producción
+                String input = JOptionPane.showInputDialog("Nuevo tiempo de producción para el Productor " + id + ":");
+                try {
+                    int nuevoTiempo = Integer.parseInt(input);
+                    // Llamar al controlador para cambiar el tiempo del productor
+                    if (controller != null) {
+                        controller.cambiarTiempoProduccion(id, nuevoTiempo);
+                    }
+                    // Actualizar el texto del botón
+                    botonProductor.setText("Productor " + id + " - Tiempo: " + nuevoTiempo);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Entrada no válida. El tiempo de producción no se ha modificado.");
+                }
+            }
+        });
+        panel.add(botonProductor);
+        frame.pack();
+    }
+
     public void agregarBotonConsumidor(int id, int tiempo) {
         JButton botonConsumidor = new JButton("Consumidor " + id + " - Tiempo: " + tiempo);
         botonConsumidor.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Aquí puedes agregar la lógica para cambiar el tiempo del consumidor si es necesario.
+                // Obtener el nuevo tiempo de consumo
+                String input = JOptionPane.showInputDialog("Nuevo tiempo de consumo para el Consumidor " + id + ":");
+                try {
+                    int nuevoTiempo = Integer.parseInt(input);
+                    // Llamar al controlador para cambiar el tiempo del consumidor
+                    if (controller != null) {
+                        controller.cambiarTiempoConsumidor(id, nuevoTiempo);
+                    }
+                    // Actualizar el texto del botón
+                    botonConsumidor.setText("Consumidor " + id + " - Tiempo: " + nuevoTiempo);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Entrada no válida. El tiempo de consumo no se ha modificado.");
+                }
             }
         });
         panel.add(botonConsumidor);
