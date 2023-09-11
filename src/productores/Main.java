@@ -1,41 +1,33 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package productores;
 
-/**
- *
- * @author User
- */
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class Main {
-    public static void main(String[] args) {
-        // Crear un búfer compartido
-        Buffer buffer = new Buffer(10); // Cambia la capacidad según tus necesidades
 
-        // Crear una lista de productores y consumidores
+    public static void main(String[] args) {
+        // Preguntar al usuario el tamaño del búfer
+        String input = JOptionPane.showInputDialog("Ingrese el tamaño del búfer:");
+        
+        // Validar la entrada del usuario y crear el búfer con el tamaño especificado
+        int bufferSize = 10; // Valor predeterminado
+        try {
+            bufferSize = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Entrada no válida. Se utilizará el tamaño predeterminado (10).");
+        }
+        
+        Buffer buffer = new Buffer(bufferSize); // Tamaño del búfer según la entrada del usuario o valor predeterminado
         List<Productor> productores = new ArrayList<>();
         List<Consumidor> consumidores = new ArrayList<>();
-
-        // Crear e inicializar los productores y consumidores según tus necesidades
-        for (int i = 0; i < 2; i++) {
-            Productor productor = new Productor(buffer, i);
-            Consumidor consumidor = new Consumidor(buffer, i);
-            productores.add(productor);
-            consumidores.add(consumidor);
-        }
-
-        // Crear la representación gráfica
         GUIRepresentation guiRepresentation = new GUIRepresentation(buffer.obtenerContenido());
+        SimulationController controller = new SimulationController(buffer, productores, consumidores, guiRepresentation, null);
 
-        // Crear el controlador de la simulación
-        SimulationController controller = new SimulationController(buffer, productores, consumidores, guiRepresentation);
-
-        // Crear y mostrar la interfaz gráfica principal
-        MainGUI mainGUI = new MainGUI(controller);
+        MainGUI mainGUI = new MainGUI(controller, guiRepresentation);
+        controller.setMainGUI(mainGUI);
         mainGUI.mostrarVentana();
     }
 }
+
+

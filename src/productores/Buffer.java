@@ -1,36 +1,60 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package productores;
 
-/**
- *
- * @author User
- */
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 
 public class Buffer {
-    private LinkedList<Integer> elementos; // Cambia el tipo si tus elementos son de otro tipo
+
+    private Queue<Elemento> buffer; // Usamos una cola para implementar el búfer
+    private int capacidad; // Capacidad máxima del búfer
 
     public Buffer(int capacidad) {
-        this.elementos = new LinkedList<>();
+        this.capacidad = capacidad;
+        this.buffer = new LinkedList<>();
     }
 
-    // Método para agregar un elemento al búfer
-    public synchronized void agregar(int elemento) throws InterruptedException {
-        // Implementa la lógica para agregar un elemento al búfer
+    public synchronized void producir(Elemento elemento, Productor productor) throws InterruptedException {
+        // Verificar si el búfer está lleno, si lo está, esperar
+        while (buffer.size() >= capacidad) {
+            productor.setEstado(EstadoProductor.ESPERANDO);
+            wait();
+        }
+
+        buffer.offer(elemento); // Agregar el elemento al búfer
+        productor.setEstado(EstadoProductor.PRODUCIENDO);
+
+        // Notificar a todos los hilos que están esperando (en caso de que haya consumidores esperando)
+        notifyAll();
     }
 
-    // Método para quitar un elemento del búfer
-    public synchronized int quitar() throws InterruptedException {
-        // Implementa la lógica para quitar un elemento del búfer
-        return 0; // Cambia esto para devolver el elemento real
+    public synchronized Elemento consumir(Consumidor consumidor) throws InterruptedException {
+        // Verificar si el búfer está vacío, si lo está, esperar
+        while (buffer.isEmpty()) {
+            consumidor.setEstado(EstadoConsumidor.ESPERANDO);
+            wait();
+        }
+
+        Elemento elemento = buffer.poll(); // Tomar el elemento del búfer
+        consumidor.setEstado(EstadoConsumidor.CONSUMIENDO);
+
+        // Notificar a todos los hilos que están esperando (en caso de que haya productores esperando)
+        notifyAll();
+
+        return elemento;
     }
 
-    // Método para obtener el contenido del búfer
-    public synchronized List<Integer> obtenerContenido() {
-        return new LinkedList<>(elementos); // Devuelve una copia de la lista de elementos
+    public int obtenerCapacidad() {
+        return capacidad;
+    }
+
+    public int obtenerTamaño() {
+        return buffer.size();
+    }
+
+    public synchronized Elemento[] obtenerContenido() {
+        // Convertir la cola de elementos en un arreglo
+        Elemento[] elementos = new Elemento[buffer.size()];
+        buffer.toArray(elementos);
+        return elementos;
     }
 }

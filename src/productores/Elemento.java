@@ -9,21 +9,24 @@ package productores;
  * @author User
  */
 public class Elemento {
-    private int id;
-    private String descripcion;
+    private int id; // Un identificador único para el elemento
+    private String contenido; // Puedes personalizar el contenido según tus necesidades
 
-    public Elemento(int id, String descripcion) {
+    public Elemento(int id, String contenido) {
         this.id = id;
-        this.descripcion = descripcion;
+        this.contenido = contenido;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getContenido() {
+        return contenido;
     }
 
-    // Otros métodos y atributos según sea necesario
+    @Override
+    public String toString() {
+        return "Elemento #" + id + ": " + contenido;
+    }
 }

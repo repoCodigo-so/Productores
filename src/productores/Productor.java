@@ -1,38 +1,85 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package productores;
 
-/**
- *
- * @author User
- */
 import java.util.Random;
 
-public class Productor extends Thread {
-    private Buffer buffer;
+public class Productor implements Runnable {
     private int id;
-    private Random random = new Random();
+    private Buffer buffer;
+    private GUIRepresentation guiRepresentation;
+    private MainGUI mainGUI; // Nueva referencia a MainGUI
+    private int tiempoProduccion;
+    private boolean running;
+    private Random random;
+    private EstadoProductor estado;
 
-    public Productor(Buffer buffer, int id) {
-        this.buffer = buffer;
+    public Productor(int id, Buffer buffer, GUIRepresentation guiRepresentation, MainGUI mainGUI) {
         this.id = id;
+        this.buffer = buffer;
+        this.guiRepresentation = guiRepresentation;
+        this.mainGUI = mainGUI; // Asigna la referencia a MainGUI
+        this.tiempoProduccion = 1000; // Tiempo predeterminado de producción (en milisegundos)
+        this.running = true;
+        this.random = new Random();
+        this.estado = EstadoProductor.ESPERANDO;
     }
 
-    @Override
     public void run() {
-        try {
-            while (true) {
-                // Generar un elemento
-                int elemento = random.nextInt(100);
-                // Intentar colocar el elemento en el búfer
-                buffer.agregar(elemento);
-                System.out.println("Productor " + id + " produjo: " + elemento);
-                sleep(random.nextInt(1000)); // Simular tiempo de producción variable
+        while (running) {
+            try {
+                // Producción de un elemento
+                Elemento elemento = new Elemento(id, "Elemento #" + id);
+
+                // Cambia el color del botón del productor a PRODUCIENDO
+                setEstado(EstadoProductor.PRODUCIENDO);
+
+                // Agrega el elemento al búfer
+                buffer.producir(elemento, this);
+
+                // Cambia el color del botón del productor a ESPERANDO
+                setEstado(EstadoProductor.ESPERANDO);
+
+                // Agrega el elemento a la lista de la interfaz gráfica a través de MainGUI
+                mainGUI.agregarElementoALista("Productor #" + id + " - Producciendo id: " + elemento.getId() + " - Produciendo contenido: " + elemento.getContenido());
+                
+                Thread.sleep(tiempoProduccion);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
+    }
+
+    public void detener() {
+        running = false;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getTiempoProduccion() {
+        return tiempoProduccion;
+    }
+
+    public void setTiempoProduccion(int tiempoProduccion) {
+        this.tiempoProduccion = tiempoProduccion;
+    }
+
+    public void cambiarTiempoProduccion(int nuevoTiempo) {
+        // Verifica que el nuevo tiempo sea válido (por ejemplo, no negativo)
+        if (nuevoTiempo >= 0) {
+            this.tiempoProduccion = nuevoTiempo;
+        } else {
+            // En caso de que el nuevo tiempo no sea válido, puedes manejarlo de acuerdo a tus necesidades
+            System.out.println("Error: El tiempo de consumo debe ser un valor no negativo.");
+        }
+    }
+
+    public EstadoProductor getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoProductor estado) {
+        this.estado = estado;
+        guiRepresentation.cambiarColorBotonProductor(id, estado.getColor());
     }
 }
