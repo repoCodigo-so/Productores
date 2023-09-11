@@ -22,8 +22,8 @@ public class Main {
 
         // Crear e inicializar los productores y consumidores según tus necesidades
         for (int i = 0; i < 2; i++) {
-            Productor productor = new Productor(buffer, i);
-            Consumidor consumidor = new Consumidor(buffer, i);
+            Productor productor = new Productor(i, buffer, null); // Puedes proporcionar la GUIRepresentation aquí si la necesitas
+            Consumidor consumidor = new Consumidor(i, buffer, null); // Puedes proporcionar la GUIRepresentation aquí si la necesitas
             productores.add(productor);
             consumidores.add(consumidor);
         }
