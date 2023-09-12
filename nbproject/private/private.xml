@@ -3,11 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Productores/src/productores/MainGUI.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Productores/src/productores/Productores.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Productores/src/productores/Buffer.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Productores/src/productores/SimulationController.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/Productores/src/productores/Main.java</file>
+            <file>file:/home/connec/Documents/5to/productores/Productores/src/productores/MainGUI.java</file>
+            <file>file:/home/connec/Documents/5to/productores/Productores/src/productores/Monitor.java</file>
+            <file>file:/home/connec/Documents/5to/productores/Productores/src/productores/Main.java</file>
+            <file>file:/home/connec/Documents/5to/productores/Productores/src/productores/GUIRepresentation.java</file>
+            <file>file:/home/connec/Documents/5to/productores/Productores/src/productores/SimulationConfig.java</file>
         </group>
     </open-files>
 </project-private>

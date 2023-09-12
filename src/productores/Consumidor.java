@@ -1,8 +1,10 @@
 package productores;
 
+import java.awt.Color;
 import javax.swing.SwingUtilities;
 
 public class Consumidor implements Runnable {
+
     private Buffer buffer;
     private GUIRepresentation guiRepresentation;
     private MainGUI mainGUI; // Nueva referencia a MainGUI
@@ -10,6 +12,7 @@ public class Consumidor implements Runnable {
     private EstadoConsumidor estado;
     private int tiempoConsumo; // Variable para almacenar el tiempo de consumo
     private boolean running;
+    private int contadorElementosConsumidos = 0;
 
     public Consumidor(int id, Buffer buffer, GUIRepresentation guiRepresentation, MainGUI mainGUI) {
         this.id = id;
@@ -29,17 +32,25 @@ public class Consumidor implements Runnable {
                 Elemento elemento = buffer.consumir(this);
                 estado = EstadoConsumidor.CONSUMIENDO;
 
-                // Simula el proceso de consumo (aquí puedes agregar tu lógica)
-                // En este ejemplo, simplemente dormimos al hilo durante el tiempo de consumo configurado.
-                Thread.sleep(tiempoConsumo);
-
                 // Actualiza la GUIRepresentation para reflejar el consumo a través de MainGUI
                 String mensaje = "Consumidor #" + id + " - Consumiendo id: " + elemento.getId() + " - Consumiendo contenido: " + elemento.getContenido();
                 mainGUI.agregarElementoALista(mensaje);
 
+                contadorElementosConsumidos++;
+
+                // Actualiza el contador de elementos consumidos en MainGUI
+                mainGUI.actualizarContadorProducidos(contadorElementosConsumidos);
+        
+                mainGUI.actualizarContadorEnBuffer(buffer.obtenerTamano());
                 
+                mainGUI.elementoConsumido(id);
+                // Simula el proceso de consumo (aquí puedes agregar tu lógica)
+                // En este ejemplo, simplemente dormimos al hilo durante el tiempo de consumo configurado.
+                Thread.sleep(tiempoConsumo);
                 // Limpia el consumo a través de MainGUI
                 // mainGUI.limpiarListaElementos();
+                                mainGUI.regresarEstado(id);
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

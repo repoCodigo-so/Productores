@@ -1,6 +1,8 @@
 package productores;
 
+import java.awt.Color;
 import java.util.Random;
+import javax.swing.SwingUtilities;
 
 public class Productor implements Runnable {
     private int id;
@@ -11,6 +13,7 @@ public class Productor implements Runnable {
     private boolean running;
     private Random random;
     private EstadoProductor estado;
+    private int contadorElementosProducidos = 0;
 
     public Productor(int id, Buffer buffer, GUIRepresentation guiRepresentation, MainGUI mainGUI) {
         this.id = id;
@@ -38,10 +41,20 @@ public class Productor implements Runnable {
                 // Cambia el color del botón del productor a ESPERANDO
                 setEstado(EstadoProductor.ESPERANDO);
 
+                contadorElementosProducidos++;
+
+// Actualiza el contador de elementos consumidos en MainGUI
+                mainGUI.actualizarContadorConsumidos(contadorElementosProducidos);
                 // Agrega el elemento a la lista de la interfaz gráfica a través de MainGUI
                 mainGUI.agregarElementoALista("Productor #" + id + " - Producciendo id: " + elemento.getId() + " - Produciendo contenido: " + elemento.getContenido());
                 
+                mainGUI.actualizarContadorEnBuffer(buffer.obtenerTamano());
+                
+                mainGUI.elementoProducido(id);
+
                 Thread.sleep(tiempoProduccion);
+                
+                mainGUI.regresarEstado(id);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

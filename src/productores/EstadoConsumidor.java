@@ -12,7 +12,7 @@ import java.awt.Color;
  */
 public enum EstadoConsumidor {
     ESPERANDO("Esperando", Color.YELLOW),
-    INACTIVO("Inactivo", Color.YELLOW),
+    INACTIVO("Inactivo", Color.PINK),
     CONSUMIENDO("Consumiendo", Color.GREEN); // Cambio aquí
 
     private final String nombre;

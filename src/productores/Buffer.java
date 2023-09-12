@@ -47,7 +47,7 @@ public class Buffer {
         return capacidad;
     }
 
-    public int obtenerTamaño() {
+    public int obtenerTamano() {
         return buffer.size();
     }
 
