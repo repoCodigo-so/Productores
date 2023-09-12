@@ -211,4 +211,16 @@ public class MainGUI {
             }
         });
     }
+    
+    public void elementoProducido(int id) {
+        guiRepresentation.cambiarColorBotonProductor(id, Color.GREEN);
+    }
+
+    public void elementoConsumido(int id) {
+        guiRepresentation.cambiarColorBotonConsumidor(id, Color.GREEN);
+    }
+    
+    public void regresarEstado(int id) {
+        guiRepresentation.cambiarColorBotonConsumidor(id, Color.YELLOW);
+    }
 }

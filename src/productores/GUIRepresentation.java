@@ -16,10 +16,11 @@ public class GUIRepresentation {
     private final Elemento[] elementos;
     private final Elemento[] elementosProducidos;
     private final Elemento[] elementosConsumidos;
-    //private final JButton btnLimpiarConsumo;
     private final JButton btnReiniciarGUI;
-    private final DefaultListModel<String> elementosListModel; // Lista para los elementos
-    private SimulationController controller; // Agregar una referencia al controlador
+    private final DefaultListModel<String> elementosListModel;
+    private SimulationController controller;
+    private final ArrayList<JButton> productorButtons;
+    private final ArrayList<JButton> consumidorButtons;
 
     public GUIRepresentation(Elemento[] elementos) {
         this.elementos = elementos;
@@ -30,13 +31,16 @@ public class GUIRepresentation {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         panel = new JPanel();
-        panel.setLayout(new GridLayout(numElementos + 2, 3)); // Tres columnas por elemento
+        panel.setLayout(new GridLayout(numElementos + 2, 3));
 
         buttons = new JButton[numElementos];
         labels = new JLabel[numElementos];
         colors = new Color[numElementos];
 
-        elementosListModel = new DefaultListModel<>(); // Lista de elementos para la interfaz
+        elementosListModel = new DefaultListModel<>();
+
+        productorButtons = new ArrayList<>();
+        consumidorButtons = new ArrayList<>();
 
         for (int i = 0; i < numElementos; i++) {
             labels[i] = new JLabel("Elemento #" + elementos[i].getId());
@@ -44,7 +48,7 @@ public class GUIRepresentation {
             buttons[i].setBackground(Color.WHITE);
             colors[i] = Color.WHITE;
 
-            final int id = i; // ID del elemento actual
+            final int id = i;
             buttons[i].addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     consumirElemento(id);
@@ -55,13 +59,6 @@ public class GUIRepresentation {
             panel.add(buttons[i]);
         }
 
-        /*btnLimpiarConsumo = new JButton("Limpiar Consumo");
-        btnLimpiarConsumo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                limpiarConsumo();
-            }
-        });*/
-
         btnReiniciarGUI = new JButton("Reiniciar GUI");
         btnReiniciarGUI.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -69,9 +66,7 @@ public class GUIRepresentation {
             }
         });
 
-        //panel.add(btnLimpiarConsumo);
         panel.add(btnReiniciarGUI);
-
         frame.add(panel);
         frame.pack();
         frame.setVisible(true);
@@ -87,8 +82,6 @@ public class GUIRepresentation {
             labels[id].setText("Elemento #" + elementos[id].getId() + " - Contenido: " + elemento.getContenido());
             buttons[id].setBackground(Color.GREEN);
             colors[id] = Color.GREEN;
-
-            // Agregar el elemento a la lista en la interfaz
             elementosListModel.addElement("Elemento #" + elementos[id].getId() + " - Contenido: " + elemento.getContenido());
         });
     }
@@ -97,12 +90,9 @@ public class GUIRepresentation {
         SwingUtilities.invokeLater(() -> {
             if (id >= 0 && id < buttons.length) {
                 if (elementosProducidos[id] != null) {
-                    // Se ha consumido el elemento producido
                     elementosConsumidos[id] = elementosProducidos[id];
                     elementosProducidos[id] = null;
                     labels[id].setText("Elemento #" + elementos[id].getId() + " - Consumido: " + elementosConsumidos[id].getContenido());
-
-                    // Agregar el elemento consumido a la lista en la interfaz
                     elementosListModel.addElement("Elemento #" + elementos[id].getId() + " - Consumido: " + elementosConsumidos[id].getContenido());
                 }
                 buttons[id].setBackground(Color.YELLOW);
@@ -135,18 +125,16 @@ public class GUIRepresentation {
 
     public void reiniciarGUI() {
         frame.dispose();
-        
         String input = JOptionPane.showInputDialog("Ingrese el tamaño del búfer:");
-        
-        // Validar la entrada del usuario y crear el búfer con el tamaño especificado
-        int bufferSize = 10; // Valor predeterminado
+
+        int bufferSize = 10;
         try {
             bufferSize = Integer.parseInt(input);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Entrada no válida. Se utilizará el tamaño predeterminado (10).");
         }
-        
-        Buffer buffer = new Buffer(bufferSize); // Tamaño del búfer según la entrada del usuario o valor predeterminado
+
+        Buffer buffer = new Buffer(bufferSize);
         java.util.List<Productor> productores = new ArrayList<>();
         java.util.List<Consumidor> consumidores = new ArrayList<>();
         GUIRepresentation guiRepresentation = new GUIRepresentation(buffer.obtenerContenido());
@@ -164,6 +152,7 @@ public class GUIRepresentation {
                 JButton button = (JButton) component;
                 if (button.getText().startsWith("Productor " + id)) {
                     panel.remove(button);
+                    productorButtons.remove(button);
                     frame.pack();
                     break;
                 }
@@ -175,21 +164,20 @@ public class GUIRepresentation {
         JButton botonProductor = new JButton("Productor " + id + " - Tiempo: " + tiempo);
         botonProductor.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Obtener el nuevo tiempo de producción
                 String input = JOptionPane.showInputDialog("Nuevo tiempo de producción para el Productor " + id + ":");
                 try {
                     int nuevoTiempo = Integer.parseInt(input);
-                    // Llamar al controlador para cambiar el tiempo del productor
                     if (controller != null) {
                         controller.cambiarTiempoProduccion(id, nuevoTiempo);
                     }
-                    // Actualizar el texto del botón
                     botonProductor.setText("Productor " + id + " - Tiempo: " + nuevoTiempo);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Entrada no válida. El tiempo de producción no se ha modificado.");
                 }
             }
         });
+        
+        productorButtons.add(botonProductor);
         panel.add(botonProductor);
         frame.pack();
     }
@@ -198,21 +186,20 @@ public class GUIRepresentation {
         JButton botonConsumidor = new JButton("Consumidor " + id + " - Tiempo: " + tiempo);
         botonConsumidor.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Obtener el nuevo tiempo de consumo
                 String input = JOptionPane.showInputDialog("Nuevo tiempo de consumo para el Consumidor " + id + ":");
                 try {
                     int nuevoTiempo = Integer.parseInt(input);
-                    // Llamar al controlador para cambiar el tiempo del consumidor
                     if (controller != null) {
                         controller.cambiarTiempoConsumidor(id, nuevoTiempo);
                     }
-                    // Actualizar el texto del botón
                     botonConsumidor.setText("Consumidor " + id + " - Tiempo: " + nuevoTiempo);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Entrada no válida. El tiempo de consumo no se ha modificado.");
                 }
             }
         });
+        
+        consumidorButtons.add(botonConsumidor);
         panel.add(botonConsumidor);
         frame.pack();
     }
@@ -224,6 +211,7 @@ public class GUIRepresentation {
                 JButton button = (JButton) component;
                 if (button.getText().startsWith("Consumidor " + id)) {
                     panel.remove(button);
+                    consumidorButtons.remove(button);
                     frame.pack();
                     break;
                 }
@@ -232,16 +220,18 @@ public class GUIRepresentation {
     }
 
     public void cambiarColorBotonProductor(int id, Color color) {
-        if (id >= 0 && id < buttons.length) {
-            buttons[id].setBackground(color);
-            colors[id] = color;
+        if (id >= 0 && id < productorButtons.size()) {
+            SwingUtilities.invokeLater(() -> {
+                productorButtons.get(id).setBackground(color);
+            });
         }
     }
 
     public void cambiarColorBotonConsumidor(int id, Color color) {
-        if (id >= 0 && id < buttons.length) {
-            buttons[id].setBackground(color);
-            colors[id] = color;
+        if (id >= 0 && id < consumidorButtons.size()) {
+            SwingUtilities.invokeLater(() -> {
+                consumidorButtons.get(id).setBackground(color);
+            });
         }
     }
 
