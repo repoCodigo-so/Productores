@@ -20,7 +20,7 @@ public class Productor implements Runnable {
         this.buffer = buffer;
         this.guiRepresentation = guiRepresentation;
         this.mainGUI = mainGUI; // Asigna la referencia a MainGUI
-        this.tiempoProduccion = 1000; // Tiempo predeterminado de producción (en milisegundos)
+        this.tiempoProduccion = 300; // Tiempo predeterminado de producción (en milisegundos)
         this.running = true;
         this.random = new Random();
         this.estado = EstadoProductor.ESPERANDO;
@@ -41,16 +41,14 @@ public class Productor implements Runnable {
                 // Cambia el color del botón del productor a ESPERANDO
                 setEstado(EstadoProductor.ESPERANDO);
 
-                contadorElementosProducidos++;
-
-// Actualiza el contador de elementos consumidos en MainGUI
-                mainGUI.actualizarContadorConsumidos(contadorElementosProducidos);
+                // Actualiza el contador de elementos consumidos en MainGUI
+                mainGUI.actualizarContadorProducidos();
                 // Agrega el elemento a la lista de la interfaz gráfica a través de MainGUI
                 mainGUI.agregarElementoALista("Productor #" + id + " - Producciendo id: " + elemento.getId() + " - Produciendo contenido: " + elemento.getContenido());
                 
                 mainGUI.actualizarContadorEnBuffer(buffer.obtenerTamano());
                 
-                mainGUI.elementoProducido(id);
+                //mainGUI.elementoProducido(id);
 
                 Thread.sleep(tiempoProduccion);
                 

@@ -33,7 +33,7 @@ public class MainGUI {
         contadorElementosConsumidos = 0;
 
         ventana = new JFrame("Simulación de Productor-Consumidor");
-        ventana.setSize(800, 600);
+        ventana.setSize(1500, 600);
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Botones para iniciar y detener la simulación
@@ -159,26 +159,14 @@ public class MainGUI {
         elementosListModel.addElement(elemento);
     }
 
-    public void elementoProducido(int id, Elemento elemento) {
-        String mensaje = "Elemento #" + id + " - Produciendo: " + elemento.getContenido();
-        agregarElementoALista(mensaje);
+    public void actualizarContadorProducidos() {
         contadorElementosProducidos++;
-        actualizarContadorProducidos(contadorElementosProducidos);
+        lblElementosProducidos.setText("Elementos Producidos: " + contadorElementosProducidos);
     }
 
-    public void elementoConsumido(int id, Elemento elemento) {
-        String mensaje = "Elemento #" + id + " - Consumiendo: " + elemento.getContenido();
-        agregarElementoALista(mensaje);
-        contadorElementosConsumidos++;
-        actualizarContadorConsumidos(contadorElementosConsumidos);
-    }
-
-    public void actualizarContadorProducidos(int contador) {
-        lblElementosProducidos.setText("Elementos Producidos: " + contador);
-    }
-
-    public void actualizarContadorConsumidos(int contador) {
-        lblElementosConsumidos.setText("Elementos Consumidos: " + contador);
+    public void actualizarContadorConsumidos() {
+        contadorElementosProducidos++;
+        lblElementosConsumidos.setText("Elementos Consumidos: " + contadorElementosProducidos);
     }
 
     public void actualizarContadorEnBuffer(int contador) {

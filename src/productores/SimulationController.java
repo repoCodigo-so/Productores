@@ -135,10 +135,4 @@ public class SimulationController {
     public void setMainGUI(MainGUI mainGUI) {
         this.mainGUI = mainGUI;
     }
-    
-    private void actualizarContadores() {
-        mainGUI.actualizarContadorProducidos(contadorElementosProducidos);
-        mainGUI.actualizarContadorConsumidos(contadorElementosConsumidos);
-        mainGUI.actualizarContadorEnBuffer(buffer.obtenerTamano());
-    }
 }

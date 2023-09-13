@@ -20,7 +20,7 @@ public class Consumidor implements Runnable {
         this.guiRepresentation = guiRepresentation;
         this.mainGUI = mainGUI; // Asigna la referencia a MainGUI
         this.estado = EstadoConsumidor.INACTIVO;
-        this.tiempoConsumo = 1000; // Tiempo predeterminado de consumo (en milisegundos)
+        this.tiempoConsumo = 300; // Tiempo predeterminado de consumo (en milisegundos)
         this.running = true;
     }
 
@@ -39,7 +39,7 @@ public class Consumidor implements Runnable {
                 contadorElementosConsumidos++;
 
                 // Actualiza el contador de elementos consumidos en MainGUI
-                mainGUI.actualizarContadorProducidos(contadorElementosConsumidos);
+                mainGUI.actualizarContadorConsumidos();
         
                 mainGUI.actualizarContadorEnBuffer(buffer.obtenerTamano());
                 
@@ -49,7 +49,7 @@ public class Consumidor implements Runnable {
                 Thread.sleep(tiempoConsumo);
                 // Limpia el consumo a través de MainGUI
                 // mainGUI.limpiarListaElementos();
-                                mainGUI.regresarEstado(id);
+                mainGUI.regresarEstado(id);
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

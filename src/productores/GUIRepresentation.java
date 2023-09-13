@@ -45,8 +45,8 @@ public class GUIRepresentation {
         for (int i = 0; i < numElementos; i++) {
             labels[i] = new JLabel("Elemento #" + elementos[i].getId());
             buttons[i] = new JButton("Consumir");
-            buttons[i].setBackground(Color.WHITE);
-            colors[i] = Color.WHITE;
+            buttons[i].setBackground(Color.MAGENTA);
+            colors[i] = Color.MAGENTA;
 
             final int id = i;
             buttons[i].addActionListener(new ActionListener() {
@@ -223,6 +223,9 @@ public class GUIRepresentation {
         if (id >= 0 && id < productorButtons.size()) {
             SwingUtilities.invokeLater(() -> {
                 productorButtons.get(id).setBackground(color);
+                if(id==1){
+                    productorButtons.get(0).setBackground(color);
+                }
             });
         }
     }
@@ -231,6 +234,9 @@ public class GUIRepresentation {
         if (id >= 0 && id < consumidorButtons.size()) {
             SwingUtilities.invokeLater(() -> {
                 consumidorButtons.get(id).setBackground(color);
+                if(id==1){
+                    consumidorButtons.get(0).setBackground(color);
+                }
             });
         }
     }
